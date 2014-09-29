@@ -1,0 +1,80 @@
+angular_distance<-function(csv_file){
+
+	if(!hasArg(csv_file))
+		stop("vector csv file not found !!!!")
+
+	vector_data<-read.csv(csv_file)
+
+	dframe<-data.frame("patent_id"=77777,"angular_distance"=0)
+
+	patentid<-unique(vector_data$patent_id)
+
+	for(pid in patentid){
+		
+		dfpid<-subset(vector_data,as.numeric(vector_data$patent_id)==pid)
+		bea_code<-unique(dfpid$bea_code)
+
+		dfpid$patent_id<-NULL
+		dfpid$bea_code<-NULL
+
+		ang_dist<-0
+		avg_ad<-0
+		angulard12<-0
+		angulard13<-0
+		angulard14<-0
+		angulard15<-0
+	
+		angulard23<-0
+		angulard24<-0
+		angulard25<-0
+
+		angulard34<-0
+		angulard35<-0
+
+		angulard45<-0
+
+		if(length(bea_code)>1){
+			v1<-dfpid[1,]	
+			v2<-dfpid[2,]
+
+			angulard12<-acos(sum(v1*v2)/(sqrt(sum(v1^2))*sqrt(sum(v2^2))))	
+			ang_dist<-angulard12	
+
+			if(length(bea_code)>2){
+				v3<-dfpid[3,]
+				angulard23<-acos(sum(v2*v3)/(sqrt(sum(v2^2))*sqrt(sum(v3^2))))	
+				angulard13<-acos(sum(v1*v3)/(sqrt(sum(v1^2))*sqrt(sum(v3^2))))
+
+				avg_ad<-c(angulard12,angulard13,angulard23)
+				ang_dist<-mean(avg_ad)
+
+				if(length(bea_code)>3){
+					v4<-dfpid[4,]
+					angulard14<-acos(sum(v1*v4)/(sqrt(sum(v1^2))*sqrt(sum(v4^2))))
+					angulard24<-acos(sum(v2*v4)/(sqrt(sum(v2^2))*sqrt(sum(v4^2))))
+					angulard34<-acos(sum(v3*v4)/(sqrt(sum(v3^2))*sqrt(sum(v4^2))))
+
+					avg_ad<-c(angulard12,angulard13,angulard14,angulard23,angulard24,angulard34)
+					ang_dist<-mean(avg_ad)
+
+					if(length(bea_code)>4){
+						v5<-dfpid[5,]
+						angulard15<-acos(sum(v1*v5)/(sqrt(sum(v1^2))*sqrt(sum(v5^2))))
+						angulard25<-acos(sum(v2*v5)/(sqrt(sum(v2^2))*sqrt(sum(v5^2))))
+						angulard35<-acos(sum(v3*v5)/(sqrt(sum(v3^2))*sqrt(sum(v5^2))))
+						angulard45<-acos(sum(v4*v5)/(sqrt(sum(v4^2))*sqrt(sum(v5^2))))
+			
+						avg_ad<-c(angulard12,angulard13,angulard14,angulard15,angulard23,angulard24,angulard25,angulard34,angulard35,angulard45)
+						ang_dist<-mean(avg_ad)
+					}
+				}				
+			}
+		}
+
+		dframe<-rbind(dframe,data.frame("patent_id"=as.numeric(pid),"angular_distance"=ang_dist))
+	}
+
+#	write distance to file
+	write.csv(dframe,file="angular_distance.csv")
+	print("output csv created!!!!")
+}
